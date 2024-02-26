@@ -5,11 +5,16 @@ import {app} from "./app.js"
 dotenv.config({
     path:'./env'
 })
-const port = 8000
-app.listen(process.env.PORT, () => {
-    console.log(`Example app listening on port ${process.env.PORT}`)
-  })
-connectDB();
+
+connectDB()
+.then(()=>{
+    app.listen(process.env.PORT||8000, () => {
+        console.log(`Server is running at port ${process.env.PORT}`)
+      })
+})
+.catch((err)=>{
+    console.log("MongoDB connection failed!!!", err)
+})
 
 /*
 sabkuchh ek index.js me hi likh do, ya fir import krke kaam karo..modular code banao
