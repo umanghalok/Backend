@@ -35,19 +35,27 @@ const registerUser=asyncHandler(async(req,res)=>{
 
 
     //check for existing user
-    const existedUser=User.findOne({
+    const existedUser=await User.findOne({
         $or: [{username},{email}]
     })
 
-    if(existedError){
+    if(existedUser){
         throw new ApiError(409, "User already exists")
     }
-//check for images, avatar
+    //check for images, avatar
     const avatarLocalPath=req.files?.avatar[0]?.path;
-    const coverImageLocalPath=req.files?.coverImage[0]?.path;
+
+    //kyuki ye check nhi ho rha alag se error ke liye, traditional method follow kro, wrna isme undefined error ayega kyuki wo field missing bhi ho skta hai
+    //const coverImageLocalPath=req.files?.coverImage[0]?.path;
+
+    let coverImageLocalPath;
+    if(req.files&&Array.isArray(req.files.coverImage)&&req.files.coverImage.length>0)
+    {
+        coverImageLocalPath=req.files.coverImage[0].path;
+    }
 
     if(!avatarLocalPath){
-        throw new ApiError(400, "Avatar file is required")
+        throw new ApiError(400, "Avatar file is required 1")
     }
 
     //upload on cloudinary and check
@@ -55,7 +63,7 @@ const registerUser=asyncHandler(async(req,res)=>{
     const coverImage = await uploadOnCloudinary(coverImageLocalPath)
 
     if(!avatar){
-        throw new ApiError(400, "Avatar file is required")
+        throw new ApiError(400, "Avatar file is required 2")
     }
 
     //send data to database
